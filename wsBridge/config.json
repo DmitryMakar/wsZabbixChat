@@ -1,0 +1,4 @@
+{
+  "wsUrl": "ws://localhost:3777?role=bridge",
+  "port": 3778
+}

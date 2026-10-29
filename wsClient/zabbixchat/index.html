@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Zabbix Chat</title>
+    <!-- Подключаем внешние стили -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="chat-app">
+        <!-- Левая панель: Список пользователей -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                В сети (<span id="count">0</span>)
+            </div>
+            <ul id="user-list" class="user-list"></ul>
+        </div>
+
+        <!-- Правая панель: Чат -->
+        <div class="main-chat">
+            <div class="chat-header">
+                <h2>Zabbix wsChat</h2>
+                
+                <!-- Блок авторизации псевдонима -->
+                <div class="auth-bar">
+                    <input type="text" id="inputName" placeholder="Сменить ник...">
+                    <button id="buttonEnter">Обновить</button>
+                </div>
+            </div>
+
+            <!-- Экран сообщений -->
+            <div id="messages" class="messages-display"></div>
+
+            <!-- Зона ввода -->
+            <div id="chat-container" class="input-area">
+                <input type="text" id="input" placeholder="Напишите сообщение... (Кликните по юзеру слева для привата)" autofocus>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключаем логику как модуль -->
+    <script type="module" src="chat.js"></script>
+</body>
+</html>

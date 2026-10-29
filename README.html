@@ -1,0 +1,130 @@
+<h1 class="text-2xl font-bold text-gray-900 mb-3 mt-4 first:mt-0">wsZabbixChat Platform (v1.0)</h1>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed"><strong class="font-bold text-gray-900">wsZabbixChat</strong> — это специализированная коммуникационная платформа для системных администраторов и инженеров эксплуатации Zabbix. Проект решает классическую проблему оперативного оповещения: трансляция критических триггеров и алертов из Zabbix напрямую в интерактивный WebSocket-чат реального времени с поддержкой приватных диалогов между дежурными администраторами.</p>
+<hr class="my-4 border-gray-200">
+<h2 class="text-xl font-bold text-gray-900 mb-2 mt-4">📺 Особенности реализации:</h2>
+<ol class="list-decimal list-inside mb-3 space-y-1 text-sm text-gray-700">
+<li class="text-sm text-gray-700">Клиент-серверная архитектура на базе протокола <strong class="font-bold text-gray-900">WebSockets</strong>.</li>
+<li class="text-sm text-gray-700">Легковесный производительный бэкенд на <strong class="font-bold text-gray-900">Node.js</strong> взамен громоздких компилируемых решений.</li>
+<li class="text-sm text-gray-700">Интеграция Zabbix через вебхуки и специализированный мост (<code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsBridge</code>).</li>
+<li class="text-sm text-gray-700">Автоматизированное управление жизненным циклом платформы с помощью bash-скриптов.</li>
+</ol>
+<hr class="my-4 border-gray-200">
+<h2 class="text-xl font-bold text-gray-900 mb-2 mt-4">📂 Структура проекта (Architecture Overview)</h2>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed">Архитектура платформы разделена на три логических компонента: центральный сервер (<code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsServer</code>), интеграционный шлюз (<code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsBridge</code>) и веб-интерфейс (<code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsClient</code>).</p>
+<pre class="bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto mb-3"><code class="language-text block bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto text-xs">.
+├── install.sh             # Скрипт автоматической установки зависимостей платформы
+├── deinstall.sh           # Скрипт корректного удаления платформы
+├── startChat.sh           # Глобальный запуск всей платформы (Server + Bridge)
+├── stopChat.sh            # Глобальный останов всей платформы
+├── statusChat.sh          # Глобальная проверка статуса процессов
+├── displayLogs.sh         # Интерактивный просмотр логов чата в реальном времени
+├── purgeLogs.sh           # Очистка лог-файлов сервера
+├── testChat.sh            # Комплексный тест проверки доступности портов
+│
+├── wsServer/              # Центральный WebSocket-сервер чата
+│   ├── wsServer.js        # Логика сервера: авторизация, роутинг PUBLIC/PRIVATE сообщений, история
+│   ├── config.json        # Конфигурация локального порта сервера
+│   ├── package.json       # Зависимости Node.js (пакет 'ws')
+│   ├── startServer.sh     # Изолированный запуск сервера в фоне через PM2
+│   ├── stopServer.sh      # Изолированный останов сервера
+│   └── statusServer.sh    # Статус процесса сервера
+│
+├── wsBridge/              # Шлюз-транслятор для алертов Zabbix
+│   ├── wsBridge.js        # Скрипт приема HTTP Webhook от Zabbix и форвардинга в сокет чата
+│   ├── config.json        # Адрес подключения к сокет-серверу
+│   ├── curl.sh            # Нативный инструмент генерации HTTP-запроса
+│   ├── sendTest.sh        # Скрипт симуляции отправки алерта Zabbix
+│   ├── startBridge.sh     # Изолированный запуск шлюза через PM2
+│   ├── stopBridge.sh      # Изолированный останов шлюза
+│   └── statusBridge.sh    # Статус процесса шлюза
+│
+└── wsClient/zabbixchat/   # Фронтенд (Браузерное приложение администратора)
+    ├── index.html         # HTML5 разметка интерфейса мессенджера
+    ├── style.css          # Современные стили (Bubbles сообщений, алерты Zabbix, приватный режим)
+    ├── chat.js            # Асинхронная логика работы с WebSocket (UI и события)
+    ├── config.json        # Адрес подключения фронтенда к WSS/WS серверу
+    └── icq.mp3            # Звуковое уведомление о новых алертах / сообщениях
+</code></pre>
+<hr class="my-4 border-gray-200">
+<h2 class="text-xl font-bold text-gray-900 mb-2 mt-4">🛠️ Автоматизация управления процессами (Управление в один клик)</h2>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed">Для удобства развертывания в корневой директории проекта подготовлены bash-скрипты автоматизации. Перед запуском убедитесь, что скрипты имеют права на исполнение (<code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">chmod +x *.sh</code>).</p>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">1. Первичная настройка</h3>
+<ul class="list-disc list-inside mb-3 space-y-1 text-sm text-gray-700">
+<li class="text-sm text-gray-700"><code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">./install.sh</code> — Разворачивает локальные зависимости (<code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">npm install</code>) в папках <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsServer</code> и <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsBridge</code>.</li>
+</ul>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">2. Запуск и Останов</h3>
+<ul class="list-disc list-inside mb-3 space-y-1 text-sm text-gray-700">
+<li class="text-sm text-gray-700"><code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">./startChat.sh</code> — Запускает <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsServer</code> и шлюз <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsBridge</code> в фоновом режиме под управлением демона <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">pm2</code>. Чат становится доступен для пользователей и Zabbix.</li>
+<li class="text-sm text-gray-700"><code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">./stopChat.sh</code> — Корректно завершает работу всех фоновых процессов платформы, предотвращая утечки памяти и занятые порты.</li>
+</ul>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">3. Diagnostics и Мониторинг</h3>
+<ul class="list-disc list-inside mb-3 space-y-1 text-sm text-gray-700">
+<li class="text-sm text-gray-700"><code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">./statusChat.sh</code> — Выводит таблицу со статусом процессов (CPU, RAM, Uptime, Restart Count) из менеджера <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">pm2</code>, а также актуальный журнал сервера.</li>
+<li class="text-sm text-gray-700"><code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">./testChat.sh</code> — Отправляет тестовое сообщение на платформу Zabbix, вызывающее срабатывание триггера, генерацию и отправку двух алертов с платформы Zabbix через wsBridge на wsServer и конечным пользователям (wsClient), отображающихся в чате в виде сообщений от бота Zabbix Server.</li>
+<li class="text-sm text-gray-700"><code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">./displayLogs.sh</code> — Выводит на экран текущий журнал работы сервера.</li>
+<li class="text-sm text-gray-700"><code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">./purgeLogs.sh</code> — Скрипт очистки файла <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">chat.log</code> на сервере для предотвращения переполнения дискового пространства.</li>
+</ul>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">4. Полное удаление</h3>
+<ul class="list-disc list-inside mb-3 space-y-1 text-sm text-gray-700">
+<li class="text-sm text-gray-700"><code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">./deinstall.sh</code> — Останавливает и удаляет процессы из pm2, очищает кэш и удаляет папки <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">node_modules</code>, после чего папка платформы wsZabbixChat может быть окончательно удалена, либо решение вновь инсталлировано скриптом install.sh.</li>
+</ul>
+<hr class="my-4 border-gray-200">
+<h2 class="text-xl font-bold text-gray-900 mb-2 mt-4">🚀 Пошаговое развертывание платформы</h2>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">Предварительные требования (Pre-requisites)</h3>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed">Перед началом развертывания платформы убедитесь, что на вашем сервере выполнены следующие условия:</p>
+<ul class="list-disc list-inside mb-3 space-y-1 text-sm text-gray-700">
+<li class="text-sm text-gray-700"><strong class="font-bold text-gray-900">Операционная система:</strong> Linux (Ubuntu/Debian/RHEL/CentOS) с доступом к терминалу.</li>
+<li class="text-sm text-gray-700"><strong class="font-bold text-gray-900">Среда выполнения:</strong> Установлен <strong class="font-bold text-gray-900">Node.js</strong> (рекомендуемая версия v16+ или v18+ LTS).</li>
+<li class="text-sm text-gray-700"><strong class="font-bold text-gray-900">Менеджер пакетов:</strong> Установлен <strong class="font-bold text-gray-900">npm</strong> или <strong class="font-bold text-gray-900">pnpm</strong> для подгрузки зависимостей.</li>
+<li class="text-sm text-gray-700"><strong class="font-bold text-gray-900">Сетевые утилиты:</strong> Наличие установленного пакета <strong class="font-bold text-gray-900">curl</strong> (необходим для работы диагностических скриптов).</li>
+<li class="text-sm text-gray-700"><strong class="font-bold text-gray-900">Платформа мониторинга:</strong> Развернутый и функционирующий сервер <strong class="font-bold text-gray-900">Zabbix</strong> (с возможностью настройки исходящих вебхуков).</li>
+<li class="text-sm text-gray-700"><strong class="font-bold text-gray-900">Веб-сервер:</strong> Установленный <strong class="font-bold text-gray-900">Nginx</strong> или <strong class="font-bold text-gray-900">Apache</strong> для хостинга клиентской веб-части и проксирования защищенных WebSocket-соединений (<code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wss://</code>).</li>
+</ul>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">Шаг 1: Размещение проекта на Linux-сервере</h3>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed">Склонируйте либо раскройте архив проекта в удобную вам директорию (например, домашнюю) на своем Linux-сервере с запущенной на нем платформой Zabbix.</p>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed">В результате у вас должна появиться папка проекта <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsZabbixChat</code>.</p>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed">Из вложенной папки <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsZabbixChat/wsClient/</code> скопируйте папку <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">zabbixchat</code> в любую доступную директорию вашего веб-сервера Nginx или Apache. Проверьте ее доступность извне, например, на тестовом стенде аналогичный адрес:
+<code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">https://www.dmpsy.ru/training/zabbixchat/</code></p>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">Шаг 2: Установка</h3>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed">Перейдите в директорию проекта на вашем Linux-сервере и выполните установку зависимостей:</p>
+<pre class="bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto mb-3"><code class="language-bash block bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto text-xs">cd ~/wsZabbixChat
+chmod +x *.sh wsServer/*.sh wsBridge/*.sh
+./install.sh
+</code></pre>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">Шаг 3: Конфигурация портов и адресов</h3>
+<ol class="list-decimal list-inside mb-3 space-y-1 text-sm text-gray-700">
+<li class="text-sm text-gray-700">Откройте <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsServer/config.json</code> и задайте внутренний порт (по умолчанию <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">3777</code>).</li>
+<li class="text-sm text-gray-700">Откройте <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsClient/zabbixchat/config.json</code> и укажите внешний адрес вашего WebSocket-сервера (например, <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wss://yourdomain.ru/ws</code>, если используется Nginx Reverse Proxy, или <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">ws://IP_СЕРВЕРА:3777</code> для локальных тестов).</li>
+</ol>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">Шаг 4: Интеграция с Zabbix (Настройка Webhook)</h3>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed">Для отсылки уведомлений с платформы Zabbix на <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wsBridge</code> настройте Webhook так, как это описано в Лекции 6:
+<a href="https://www.dmpsy.ru/training/lectures/lecture_06_zabbix_72_configuring_alerts.pdf" class="text-gray-900 underline hover:no-underline" target="_blank" rel="noopener noreferrer">Инструкция по настройке оповещений (PDF)</a>
+либо (более подробно) в материалах Лекции 12 курса Zabbix.</p>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed"><em class="italic">NB. Для проверки работы шлюза без Zabbix вы можете запустить тестовый скрипт симуляции из папки моста:</em></p>
+<pre class="bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto mb-3"><code class="language-bash block bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto text-xs">cd wsBridge
+./curl.sh
+</code></pre>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">Шаг 5: Запуск платформы</h3>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed">Запустите систему в фоновом режиме под управлением PM2 и проверьте статус её компонентов:</p>
+<pre class="bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto mb-3"><code class="language-bash block bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto text-xs">./startChat.sh
+./statusChat.sh
+</code></pre>
+<h3 class="text-lg font-semibold text-gray-900 mb-2 mt-3">Шаг 6: Останов платформы</h3>
+<p class="text-sm text-gray-700 mb-3 leading-relaxed">При необходимости проведения технических работ или изменения конфигурации остановите все фоновые процессы платформы командой:</p>
+<pre class="bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto mb-3"><code class="language-bash block bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto text-xs">./stopChat.sh
+</code></pre>
+<hr class="my-4 border-gray-200">
+<h2 class="text-xl font-bold text-gray-900 mb-2 mt-4">🔒 Безопасность и правила чата</h2>
+<ul class="list-disc list-inside mb-3 space-y-1 text-sm text-gray-700">
+<li class="text-sm text-gray-700"><strong class="font-bold text-gray-900">Изоляция приватных сообщений:</strong> Сообщения типа <code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">PRIVATE_MSG</code> логируются на сервере исключительно для целей технического аудита, но алгоритм подгрузки истории (<code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">HISTORY_REPLY</code>) <strong class="font-bold text-gray-900">гарантированно отсекает</strong> их. При перезагрузке страницы ни один сторонний пользователь не сможет получить доступ к вашей приватной переписке с коллегами.</li>
+<li class="text-sm text-gray-700"><strong class="font-bold text-gray-900">Reverse Proxy:</strong> В продуктивной среде настоятельно рекомендуется разворачивать платформу за веб-сервером <strong class="font-bold text-gray-900">Nginx</strong> с настроенным SSL-сертификатом (Let's Encrypt) для обеспечения шифрования трафика (<code class="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-xs">wss://</code>).</li>
+</ul>
+<hr class="my-4 border-gray-200">
+<h2 class="text-xl font-bold text-gray-900 mb-2 mt-4">🛠️ Планируемые доработки для Версии 2.0</h2>
+<ul class="list-disc list-inside mb-3 space-y-1 text-sm text-gray-700">
+<li class="text-sm text-gray-700"><input readonly="" class="mr-2 rounded border-gray-300" disabled="" node="[object Object]" type="checkbox"> <strong class="font-bold text-gray-900">Zabbix Auth Integration:</strong> Сквозная аутентификация пользователей-администраторов через штатное API Zabbix.</li>
+<li class="text-sm text-gray-700"><input readonly="" class="mr-2 rounded border-gray-300" disabled="" node="[object Object]" type="checkbox"> <strong class="font-bold text-gray-900">Log Rotation:</strong> Интеграция автоматической ротации логов на сервере Node.js для контроля дискового пространства.</li>
+<li class="text-sm text-gray-700"><input readonly="" class="mr-2 rounded border-gray-300" disabled="" node="[object Object]" type="checkbox"> <strong class="font-bold text-gray-900">i18n Multilingual UI:</strong> Добавление полноценной мультиязычности интерфейса клиентского чата.</li>
+<li class="text-sm text-gray-700"><input readonly="" class="mr-2 rounded border-gray-300" disabled="" node="[object Object]" type="checkbox"> <strong class="font-bold text-gray-900">File &amp; Metric Sharing:</strong> Реализация возможности быстрой пересылки скриншотов графиков и файлов данных между инженерами.</li>
+<li class="text-sm text-gray-700"><input readonly="" class="mr-2 rounded border-gray-300" disabled="" node="[object Object]" type="checkbox"> <strong class="font-bold text-gray-900">WebRTC Voice Calls:</strong> Внедрение встроенных голосовых звонков в один клик между дежурными администраторами при возникновении инцидентов.</li>
+</ul>

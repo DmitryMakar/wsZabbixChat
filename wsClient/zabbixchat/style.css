@@ -1,0 +1,246 @@
+:root {
+    --primary-color: #007bff;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --bg-light: #f8f9fa;
+    --border-color: #dee2e6;
+    --text-dark: #343a40;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #eef2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: var(--text-dark);
+}
+
+.chat-app {
+    display: flex;
+    width: 95vw;
+    max-width: 1100px;
+    height: 85vh;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Боковая панель пользователей */
+.sidebar {
+    width: 260px;
+    background: var(--bg-light);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-bottom: 1px solid var(--border-color);
+    background: #fff;
+}
+
+.user-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.user-list li {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.user-list li:hover {
+    background-color: #e9ecef;
+}
+
+.user-list li.active-recipient {
+    background-color: #e2f0fe;
+    color: var(--primary-color);
+    font-weight: 600;
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Главная область чата */
+.main-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    height: 100%;
+    min-height: 0; /* Важно: заставляет контейнер держать внутренние пропорции */
+}
+
+.chat-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0; /* Шапка никогда не сожмется */
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+/* Область сообщений */
+.messages-display {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #fdfdfd;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0; /* Важно: разрешает блоку скроллиться и не схлопываться в 0px */
+}
+
+/* Стилизация блоков сообщений */
+.msg-block {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    align-self: flex-start;
+    background: #f1f3f5;
+    color: #343a40;
+    flex-shrink: 0; /* Сообщения сохраняют свой размер по высоте */
+}
+
+/* Мои сообщения */
+.msg-block.msg-own {
+    align-self: flex-end;
+    background: var(--primary-color);
+    color: #fff !important;
+    flex-shrink: 0;
+}
+
+/* Мои собственные приватные сообщения */
+.msg-block.msg-own.msg-private {
+    background: #bbeeec; /* Более насыщенный мятно-голубой цвет фона */
+    color: #0b4e58 !important; /* Насыщенный темный текст вместо белого */
+    border: 1px dashed #17a2b8;
+    align-self: flex-end;
+}
+
+/* Системные сообщения сервера */
+.msg-block.msg-system {
+    align-self: center;
+    background: transparent;
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-style: italic;
+    border: none;
+    padding: 2px;
+    white-space: normal;
+    flex-shrink: 0;
+}
+
+/* Сообщения от Zabbix (выделяем как алерты) */
+.msg-block.msg-zabbix {
+    align-self: flex-start;
+    background: #fff3cd;
+    border-left: 4px solid var(--warning-color);
+    color: #856404;
+    font-family: monospace;
+    max-width: 90%;
+    flex-shrink: 0;
+}
+
+/* Приватные сообщения (входящие от других) */
+.msg-block.msg-private {
+    background: #e8f4fd;
+    border: 1px dashed #17a2b8;
+    color: #0c5460;
+    flex-shrink: 0;
+}
+
+
+.msg-author {
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    display: block;
+    color: #495057;
+}
+
+.msg-own .msg-author {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Область ввода */
+.input-area {
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+    background: #fff;
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0; /* Зона ввода никогда не сожмется */
+}
+
+.input-area input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.95rem;
+    transition: border 0.2s;
+}
+
+.input-area input:focus {
+    border-color: var(--primary-color);
+}
+
+.input-area input.private-mode {
+    background-color: #f0f8ff;
+    border-color: #17a2b8;
+}
+
+/* Панель входа */
+.auth-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.auth-bar input {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.auth-bar button {
+    padding: 6px 12px;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.auth-bar button:hover {
+    background: #0069d9;
+}
